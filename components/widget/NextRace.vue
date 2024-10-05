@@ -69,6 +69,10 @@ const nextRace = computed(() => {
     });
 });
 
+const openInNewTab = (data) => {
+    const url = `http://www.racebets.com/bet/${data}`
+    window.open(url, '_blank'); // Less likely to be blocked
+}
 
 
 </script>
@@ -108,15 +112,11 @@ const nextRace = computed(() => {
                             class="w-6 h-6 mr-3" />
                         <span class="text-gray-900">{{ runner.name }}</span>
                     </div>
-                    <button class="bg-yellow-400 text-gray-900 font-bold py-1 px-3 min-w-16 rounded">{{ runner.odds
+                    <button @click="openInNewTab(nextRace.id_race)"
+                        class="bg-yellow-400 text-gray-900 font-bold py-1 px-3 min-w-16 rounded">{{ runner.odds
                         }}</button>
                 </li>
             </ul>
-
-            <a :href="`http://www.racebets.com/bet/${nextRace.id_race}`"
-                class="block text-center bg-blue-500 text-white font-bold py-2 px-4 rounded mt-4 hover:bg-blue-600">
-                Place Bet
-            </a>
         </div>
 
         <div v-else class="no-race text-center text-red-500">
