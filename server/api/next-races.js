@@ -1,15 +1,15 @@
-// server/api/next-races.js
-
 import { readFile } from 'fs/promises';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
 export default defineEventHandler(async (event) => {
     try {
-        const filePath = path.join(process.cwd(), 'demo', 'next_races.json');
-        console.log(filePath)
+        const __filename = fileURLToPath(import.meta.url);
+        const __dirname = path.dirname(__filename);
+        const filePath = path.join(__dirname, '..', '..', 'demo', 'next_races.json');
+        console.log(`Reading file from: ${filePath}`);
 
         const data = await readFile(filePath, 'utf-8');
-
         const jsonData = JSON.parse(data);
 
         return jsonData;
