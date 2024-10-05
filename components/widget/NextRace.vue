@@ -78,7 +78,7 @@ const openInNewTab = (data) => {
 </script>
 
 <template>
-    <div class="max-w-xs bg-gray-800 text-white rounded-lg border p-4">
+    <div class="max-w-xs bg-gray-800 text-white rounded-md border p-2">
 
         <div v-if="loading" class="loading text-center">
             <p>Loading next race...</p>
@@ -88,25 +88,27 @@ const openInNewTab = (data) => {
         </div>
 
         <div v-else-if="nextRace" class="next-race-widget">
-            <div class="flex justify-between items-center mb-4">
+            <div class="flex justify-between items-center mb-2">
                 <div class="flex items-center">
-                    <div :class="`flag-${nextRace.event.country}`"></div>
+                    <div :class="`flag-${nextRace.event.country}`" class="mr-2"></div>
                     <h3 class="text-lg font-bold">{{ nextRace.event.title }}</h3>
                 </div>
                 <span class="text-sm font-medium">{{ getRemainingTime(nextRace.post_time) }}</span>
             </div>
 
-            <div class="flex justify-between items-center text-gray-300 text-sm mb-4">
-                <p>{{ nextRace.num_runners }} runners</p>
-                <p>{{ nextRace.distance }} m</p>
-                <p>{{ getFormatedPurse(nextRace.purse) }}</p>
+            <div class="flex justify-between items-center text-gray-300 text-sm mb-4 border-t border-[#666666] pt-2">
+                <div class="flex">
+                    <p class="border-r border-[#666666] pr-2 mr-2">{{ nextRace.num_runners }} runners</p>
+                    <p class="border-r border-[#666666] pr-2 mr-2">{{ nextRace.distance }} m</p>
+                    <p class="">{{ getFormatedPurse(nextRace.purse) }}</p>
+                </div>
                 <img :src="getRaceTypeIcon(nextRace.race_type)" :alt="`race-type-${nextRace.race_type}`" />
 
             </div>
 
-            <ul class="space-y-3 p-4 bg-white">
+            <ul class="bg-white">
                 <li v-for="runner in nextRace.runners" :key="runner.id_runner"
-                    class="flex justify-between items-center border-b last:border-none pb-3 last:pb-0">
+                    class="flex justify-between items-center border-b last:border-none py-2 px-2">
                     <div class="flex items-center">
                         <img v-if="runner.silk" :src="`/silks/${runner.silk}`" :alt="`${runner.name} Silk`"
                             class="w-6 h-6 mr-3" />
