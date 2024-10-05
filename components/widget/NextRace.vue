@@ -39,9 +39,9 @@ const fetchRaces = async () => {
 
 
 
-fetchRaces();
 
 onMounted(() => {
+    fetchRaces();
 });
 
 watch(() => props.filters, () => {
