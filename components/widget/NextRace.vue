@@ -19,7 +19,6 @@ const fetchRaces = async () => {
     loading.value = true;
     error.value = null;
     try {
-        console.log('-------------')
         const response = await axios.get('/api/next-races');
         if (response.data.status === 'success') {
             racesData.value = response.data.data.races;
@@ -37,12 +36,8 @@ const fetchRaces = async () => {
     }
 };
 
+fetchRaces();
 
-
-
-onMounted(() => {
-    fetchRaces();
-});
 
 watch(() => props.filters, () => {
 }, { deep: true });
