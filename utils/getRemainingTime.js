@@ -1,6 +1,10 @@
 export const getRemainingTime = (postTime) => {
-    const currentTime = Math.floor(Date.now() / 1000)
-    console.error(currentTime)
+    if (typeof postTime !== 'number') {
+        console.warn('Invalid postTime provided to getRemainingTime:', postTime);
+        return 'Invalid Time';
+    }
+
+    const currentTime = Math.floor(Date.now() / 1000);
     let remainingSeconds = postTime - currentTime;
 
     if (remainingSeconds <= 0) {
@@ -20,5 +24,5 @@ export const getRemainingTime = (postTime) => {
     if (minutes > 0) timeString += `${minutes}m `;
     timeString += `${seconds}s`;
 
-    return timeString;
+    return timeString.trim();
 };

@@ -1,8 +1,6 @@
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue';
-import axios from 'axios';
+import { ref, computed } from 'vue';
 import { EXCHANGE } from "~/constants/exchangeRate";
-
 
 const props = defineProps({
     filters: {
@@ -11,40 +9,26 @@ const props = defineProps({
     }
 });
 
-const loading = ref(true);
-const error = ref(null);
-const racesData = ref([]);
+const { data: responseData, pending: isLoading, error: fetchError } = useFetch('/api/next-races', {
+    params: { ...props.filters },
+});
 
-const fetchRaces = async () => {
-    loading.value = true;
-    error.value = null;
-    try {
-        const response = await axios.get('/api/next-races');
-        if (response.data.status === 'success') {
-            racesData.value = response.data.data.races;
-        } else {
-            console.error('Error fetching races:', response.data.message);
-            racesData.value = [];
-            error.value = response.data.message;
-        }
-    } catch (err) {
-        console.error('Error fetching races data:', err);
-        racesData.value = [];
-        error.value = 'Failed to fetch race data.';
-    } finally {
-        loading.value = false;
+const racesData = computed(() => {
+    if (responseData.value && responseData.value.status === 'success') {
+        return responseData.value.data.races;
     }
-};
+    return [];
+});
 
-fetchRaces();
-
-
-watch(() => props.filters, () => {
-}, { deep: true });
-
-const getRaceTypeIcon = (raceKey) => {
-    return new URL(`/public/race-types/race-type-${raceKey}.svg`, import.meta.url).href;
-};
+const error = computed(() => {
+    if (fetchError.value) {
+        return fetchError.value.message || 'Failed to fetch race data.';
+    }
+    if (responseData.value && responseData.value.status !== 'success') {
+        return responseData.value.message || 'Error fetching races.';
+    }
+    return null;
+});
 
 const nextRace = computed(() => {
     if (error.value) {
@@ -69,20 +53,25 @@ const nextRace = computed(() => {
     });
 });
 
-const openInNewTab = (data) => {
-    const url = `http://www.racebets.com/bet/${data}`
-    window.open(url, '_blank'); // Less likely to be blocked
-}
+const getRaceTypeIcon = (raceKey) => {
+    return `/race-types/race-type-${raceKey}.svg`;
+};
 
-
+const openInNewTab = (raceId) => {
+    const url = `http://www.racebets.com/bet/${raceId}`;
+    if (typeof window !== 'undefined') {
+        window.open(url, '_blank');
+    }
+};
 </script>
 
 <template>
-    <div class="max-w-xs bg-gray-800 text-white rounded-md border p-2">
+    <div class="max-w-md w-80 bg-gray-800 text-white rounded-md border p-2">
 
-        <div v-if="loading" class="loading text-center">
+        <div v-if="isLoading" class="loading text-center">
             <p>Loading next race...</p>
         </div>
+
         <div v-else-if="error" class="error text-center ">
             <p>{{ error }}</p>
         </div>
@@ -102,8 +91,7 @@ const openInNewTab = (data) => {
                     <p class="border-r border-[#666666] pr-2 mr-2">{{ nextRace.distance }} m</p>
                     <p class="">{{ getFormatedPurse(nextRace.purse) }}</p>
                 </div>
-                <img :src="getRaceTypeIcon(nextRace.race_type)" :alt="`race-type-${nextRace.race_type}`" />
-
+                <img loading="lazy" :src="getRaceTypeIcon(nextRace.race_type)" :alt="`type-${nextRace.race_type}`" />
             </div>
 
             <ul class="bg-white">
@@ -111,12 +99,13 @@ const openInNewTab = (data) => {
                     class="flex justify-between items-center border-b last:border-none py-2 px-2">
                     <div class="flex items-center">
                         <img v-if="runner.silk" :src="`/silks/${runner.silk}`" :alt="`${runner.name} Silk`"
-                            class="w-6 h-6 mr-3" />
+                            class="w-6 h-6 mr-3" loading="lazy" />
                         <span class="text-gray-900">{{ runner.name }}</span>
                     </div>
                     <button @click="openInNewTab(nextRace.id_race)"
-                        class="bg-yellow-400 text-gray-900 font-bold py-1 px-3 min-w-16 rounded">{{ runner.odds
-                        }}</button>
+                        class="bg-yellow-400 text-gray-900 font-bold py-1 px-3 min-w-16 rounded">
+                        {{ runner.odds }}
+                    </button>
                 </li>
             </ul>
         </div>
@@ -126,7 +115,6 @@ const openInNewTab = (data) => {
         </div>
     </div>
 </template>
-
 
 <style scoped>
 .next-race-widget {
@@ -183,14 +171,4 @@ const openInNewTab = (data) => {
     color: white;
 }
 
-@media (max-width: 600px) {
-    .next-race-widget {
-        padding: 10px;
-    }
-
-    .bet-button {
-        width: 100%;
-        text-align: center;
-    }
-}
 </style>
