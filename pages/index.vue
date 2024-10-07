@@ -11,4 +11,5 @@ const setFilters = (newFilters) => {
 <template>
     <RaceFilter @update-filters="setFilters" />
     <WidgetNextRace :filters="activeFilters" />
+    <Footer />
 </template>
